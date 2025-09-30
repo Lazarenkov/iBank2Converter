@@ -1,4 +1,4 @@
-package core.data.content;
+package core.data.content.processed;
 
 import com.linuxense.javadbf.DBFField;
 
@@ -16,7 +16,7 @@ public class DBFProcessedContent extends ProcessedContent {
         return dbfFields;
     }
 
-    public Object[] getObjects() {
+    public Object[] getValues() {
         return values;
     }
 }

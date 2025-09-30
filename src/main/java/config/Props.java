@@ -1,7 +1,7 @@
 package config;
 
 import core.data.types.Format;
-import exceptions.InitException;
+import exceptions.ConversionInterruptedException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -26,17 +26,18 @@ public class Props {
     }
 
     private static void collectOutputFormat(String[] args) {
-        if (args[0].equalsIgnoreCase("DBF") | args[0].equalsIgnoreCase("CSV")){
+        if (args[0].equalsIgnoreCase("DBF") | args[0].equalsIgnoreCase("CSV")) {
             props.put("FORMAT", args[0].toUpperCase());
         } else {
-            throw new InitException("Некорректный параметр запуска: " + args[0]);
+            throw new ConversionInterruptedException("Некорректный параметр запуска: " + args[0]);
         }
     }
 
-    private static void addDefaultProps(){
+    private static void addDefaultProps() {
         props.put("INPUT", null);
         props.put("CLEAR_INPUT", "true");
         props.put("CLEAR_OUTPUT", "true");
+        props.put("PARSE_EMPTY", "true");
         switch (getFormat()) {
             case DBF -> {
                 props.put("DBF_OUTPUT", null);
@@ -60,7 +61,7 @@ public class Props {
                 }
             }
         } catch (IOException e) {
-            throw new InitException("Не удалось прочитать файл test.properties");
+            throw new ConversionInterruptedException("Не удалось прочитать файл test.properties");
         }
     }
 
@@ -78,17 +79,17 @@ public class Props {
     private static void validateProps() {
         props.forEach((key, value) -> {
             if (value == null || value.isBlank()) {
-                throw new InitException("Не задан параметр " + key + " в файле properties");
+                throw new ConversionInterruptedException("Не задан параметр " + key + " в файле properties");
             }
         });
         String characterset = props.get("СHARACTERSET");
-        if (!characterset.equals("WINDOWS-1251") & !characterset.equals("CP866")) { //TODO org.apache.commons:commons-lang3.containsAny()
-            throw new InitException("Не корректное значение параметра СHARACTERSET");
+        if (!characterset.equals("WINDOWS-1251") & !characterset.equals("CP866")) {
+            throw new ConversionInterruptedException("Не корректное значение параметра СHARACTERSET");
         }
     }
 
     public static Format getFormat() {
-        if (props.get("FORMAT").equals("DBF")){
+        if (props.get("FORMAT").equals("DBF")) {
             return DBF;
         } else {
             return CSV;
@@ -100,7 +101,7 @@ public class Props {
     }
 
     public static String getOutputPath() {
-        if (getFormat()==DBF){
+        if (getFormat() == DBF) {
             return props.get("DBF_OUTPUT");
         } else {
             return props.get("CSV_OUTPUT");
@@ -108,22 +109,26 @@ public class Props {
     }
 
     public static String getDCTOutputPath() {
-        if (getFormat()==DBF){
+        if (getFormat() == DBF) {
             return props.get("DBF_DCT_OUTPUT");
         } else {
             return props.get("CSV_DCT_OUTPUT");
         }
     }
 
-    public static boolean isClearInput(){
+    public static boolean isClearInput() {
         return Boolean.parseBoolean(props.get("CLEAR_INPUT"));
     }
 
-    public static boolean isClearOutput(){
+    public static boolean isClearOutput() {
         return Boolean.parseBoolean(props.get("CLEAR_OUTPUT"));
     }
 
-    public static String getCharacterset(){
+    public static String getCharacterset() {
         return props.get("СHARACTERSET");
+    }
+
+    public static boolean isParseEmpty() {
+        return Boolean.parseBoolean(props.get("PARSE_EMPTY"));
     }
 }

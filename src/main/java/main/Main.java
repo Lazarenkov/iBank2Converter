@@ -1,31 +1,39 @@
 package main;
 
 import config.Props;
-import core.data.content.ImportedContent;
-import core.data.content.ProcessedContent;
+import core.data.content.imported.ImportContent;
+import core.data.content.processed.ProcessedContent;
 import core.factory.ProcessorFactory;
 import core.process.Processor;
 import input.IBank2Reader;
-import output.DBFSaver;
+import input.InputWalker;
+import output.DCTSaver;
 import output.Saver;
-
-import java.io.IOException;
+import output.SaverFactory;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
-        args = new String[]{"dbf"};
+    public static void main(String[] args){
+        args = new String[]{"dbf"};//TODO убрать при генерации JAR
 
         Props.init(args);
 
-        IBank2Reader reader = new IBank2Reader();
-        reader.read();
-        ImportedContent content = reader.getContent();
+        InputWalker.walk();
+        while (InputWalker.hasNextPath()){
+            IBank2Reader reader = new IBank2Reader();
+            reader.read();
+            ImportContent content = reader.getContent();
 
-        Processor processor = new ProcessorFactory().createProcessor(Props.getFormat(), content);
-        ProcessedContent processedContent = processor.process();
+            Processor processor = new ProcessorFactory().createProcessor(Props.getFormat(), content);
+            processor.processData();
+            processor.processDCT();
+            ProcessedContent dataProcessedContent = processor.getDataContent();
+            ProcessedContent dctProcessedContent = processor.getDctContent();
 
-        Saver saver = new DBFSaver();
-        saver.saveToFile(processedContent);
+            Saver dataSaver = new SaverFactory().createSaver(Props.getFormat(), dataProcessedContent);
+            dataSaver.saveToFile();
+            Saver dctSaver = new DCTSaver(dctProcessedContent);
+            dctSaver.saveToFile();
+        }
     }
 }

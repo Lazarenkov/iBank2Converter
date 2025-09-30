@@ -2,8 +2,10 @@ package output;
 
 import com.linuxense.javadbf.DBFWriter;
 import config.Props;
-import core.data.content.DBFProcessedContent;
-import core.data.content.ProcessedContent;
+import core.data.content.processed.DBFProcessedContent;
+import core.data.content.processed.ProcessedContent;
+import exceptions.ConversionInterruptedException;
+import input.InputWalker;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,16 +13,23 @@ import java.io.OutputStream;
 
 public class DBFSaver implements Saver {
 
+    private DBFProcessedContent processedContent;
+
+    public DBFSaver(ProcessedContent processedContent) {
+        this.processedContent = (DBFProcessedContent) processedContent;
+    }
+
     @Override
-    public void saveToFile(ProcessedContent processedContent) {
+    public void saveToFile() {
+        String fileOutput = Props.getOutputPath() + "/" + InputWalker.getCurrentFileName() + ".dbf";
         DBFWriter writer = new DBFWriter();
         writer.setCharactersetName(Props.getCharacterset());
-        try (OutputStream output = new FileOutputStream(Props.getOutputPath() + "/export.dbf")) {
-            writer.setFields(((DBFProcessedContent) processedContent).getDbfFields());
-            writer.addRecord(((DBFProcessedContent) processedContent).getObjects());
+        try (OutputStream output = new FileOutputStream(fileOutput)) {
+            writer.setFields(processedContent.getDbfFields());
+            writer.addRecord(processedContent.getValues());
             writer.write(output);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ConversionInterruptedException("Ошибка при сохранении файла в " + fileOutput);
         }
     }
 }

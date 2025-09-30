@@ -1,48 +1,55 @@
 package input;
 
 import config.Props;
-import core.data.content.ImportedContent;
+import core.data.content.imported.ImportContent;
+import exceptions.ConversionInterruptedException;
 
 import java.io.*;
 import java.nio.charset.Charset;
 
 public class IBank2Reader {
 
-    private final ImportedContent content = new ImportedContent();
+    private final ImportContent content = new ImportContent();
 
     public void read() {
-        try (FileInputStream stream = new FileInputStream(Props.getInputPath() + "/import.txt");
+        try (FileInputStream stream = new FileInputStream(InputWalker.getNextPath().toString());
              InputStreamReader reader = new InputStreamReader(stream, Charset.forName("windows-1251"));
              BufferedReader bufferedReader = new BufferedReader(reader);
         ) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                parse(line);
+                parse(line.trim());
             }
         } catch (IOException e) {
+            throw new ConversionInterruptedException("Ошибка при чтении файла " + InputWalker.getCurrentPath());
         }
     }
 
     private void parse(String line) {
-        if(line.isBlank() || !line.matches("^\\s*[^\\s=][^=]*=[^=]*[^\\s=]\\s*$")){
+        if (line.isBlank()) {
             return;
+        } else if (!line.matches("^[^=][^=]*=[^=]*$")) {
+            throw new ConversionInterruptedException("Некорректная строка: " + line);
         }
 
         int split = line.indexOf("=");
-        String name = line.substring(0, split);
-        String value = line.substring(split + 1);
+        String name = line.substring(0, split).trim();
+        String value = line.substring(split + 1).trim();
+        if (!Props.isParseEmpty() & value.isBlank()) {
+            return;
+        }
         addToContent(name, value);
     }
 
-    private void addToContent(String name, String value){
-        if(name.equals("Content-Type")){
+    private void addToContent(String name, String value) {
+        if (name.equals("Content-Type")) {
             content.setContentType(value);
         } else {
-            content.add(name.trim(), value.trim());
+            content.add(name, value);
         }
     }
 
-    public ImportedContent getContent() {
+    public ImportContent getContent() {
         return content;
     }
 }

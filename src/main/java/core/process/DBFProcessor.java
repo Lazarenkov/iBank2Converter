@@ -1,41 +1,46 @@
 package core.process;
 
 import com.linuxense.javadbf.DBFField;
-import core.data.content.ImportedContent;
-import core.data.content.DBFProcessedContent;
-import core.data.content.ProcessedContent;
+import core.data.content.imported.ImportContent;
+import core.data.content.processed.DBFProcessedContent;
+import core.data.content.processed.DCTProcessedContent;
 
 import java.util.ArrayList;
 
 public class DBFProcessor implements Processor {
 
-    private final DBFField[] dbfFields;
-    private final Object[] values;
+    private final ImportContent importContent;
 
-    private ArrayList<String> dbfNames = new ArrayList<>();
-    private ArrayList<Integer> lengths = new ArrayList<>();
+    private final DBFProcessedContent dataContent;
+    private final DCTProcessedContent dctContent;
 
-    private final ImportedContent content;
+    private final ArrayList<String> dbfNames = new ArrayList<>();
+    private final ArrayList<Integer> lengths = new ArrayList<>();
 
-    public DBFProcessor(ImportedContent content) {
-        this.content = content;
-        dbfFields = new DBFField[content.size()];
-        values = new Object[content.size()];
+    public DBFProcessor(ImportContent importContent) {
+        this.importContent = importContent;
+        dataContent = new DBFProcessedContent(new DBFField[importContent.size()], new Object[importContent.size()]);
+        dctContent = new DCTProcessedContent();
     }
 
     @Override
-    public ProcessedContent process() {
+    public void processData() {
         reduceNamesLength();
         checkDuplicatedDBFNames();
         calculateLengths();
         addFields();
         addValues();
-        return new DBFProcessedContent(dbfFields, values);
+    }
+
+    @Override
+    public void processDCT() {
+        addDCTHeaders();
+        addDCTBody();
     }
 
     private void reduceNamesLength() {
-        for (int i = 0; i < content.size(); i++) {
-            String name = content.getName(i);
+        for (int i = 0; i < importContent.size(); i++) {
+            String name = importContent.getName(i);
             if (name.length() >= 11) {
                 dbfNames.add(name.substring(0, 10));
             } else {
@@ -66,24 +71,54 @@ public class DBFProcessor implements Processor {
     }
 
     private void calculateLengths() {
-        for (int i = 0; i < content.size(); i++) {
-            lengths.add(content.getValue(i).length());
+        for (int i = 0; i < importContent.size(); i++) {
+            if (!importContent.getValue(i).isEmpty()) {
+                lengths.add(importContent.getValue(i).length());
+            } else {
+                lengths.add(1);
+            }
         }
     }
 
-    public void addFields() {
-        for (int i = 0; i < content.size(); i++) {
+    private void addFields() {
+        for (int i = 0; i < importContent.size(); i++) {
             DBFField dbffield = new DBFField();
             dbffield.setName(dbfNames.get(i));
             dbffield.setDataType((byte) 67);
             dbffield.setFieldLength(lengths.get(i));
-            dbfFields[i] = dbffield;
+            dataContent.getDbfFields()[i] = dbffield;
         }
     }
 
     private void addValues() {
-        for (int i = 0; i < content.size(); i++) {
-            values[i] = content.getValue(i);
+        for (int i = 0; i < importContent.size(); i++) {
+            dataContent.getValues()[i] = importContent.getValue(i);
         }
+    }
+
+    private void addDCTHeaders() {
+        dctContent.getLines().add("Content-Type=" + importContent.getContentType());
+        dctContent.getLines().add("Data-Type=dct");
+        dctContent.getLines().add("Import-Format=dbf");
+        dctContent.getLines().add("First-String-Read=true");
+        dctContent.getLines().add("");
+    }
+
+    private void addDCTBody() {
+        for (int i = 0; i < importContent.size(); i++) {
+            String name = importContent.getName(i);
+            String dbfName = dbfNames.get(i);
+            dctContent.getLines().add(name.toUpperCase() + "=${" + dbfName.toUpperCase() + "}");
+        }
+    }
+
+    @Override
+    public DBFProcessedContent getDataContent() {
+        return dataContent;
+    }
+
+    @Override
+    public DCTProcessedContent getDctContent() {
+        return dctContent;
     }
 }
