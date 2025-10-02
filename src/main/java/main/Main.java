@@ -5,11 +5,12 @@ import core.data.content.imported.ImportContent;
 import core.data.content.processed.ProcessedContent;
 import core.factory.ProcessorFactory;
 import core.process.Processor;
-import input.IBank2Reader;
-import input.InputWalker;
-import output.DCTSaver;
-import output.Saver;
-import output.SaverFactory;
+import storage.cleaner.DirectoryCleaner;
+import storage.reader.IBank2Reader;
+import storage.walker.InputWalker;
+import storage.saver.DCTSaver;
+import storage.saver.Saver;
+import storage.saver.SaverFactory;
 
 public class Main {
 
@@ -19,6 +20,7 @@ public class Main {
         Props.init(args);
 
         InputWalker.walk();
+        DirectoryCleaner.clearOutputDirectories();
         while (InputWalker.hasNextPath()){
             IBank2Reader reader = new IBank2Reader();
             reader.read();
@@ -35,5 +37,6 @@ public class Main {
             Saver dctSaver = new DCTSaver(dctProcessedContent);
             dctSaver.saveToFile();
         }
+        DirectoryCleaner.deleteInputFiles();
     }
 }

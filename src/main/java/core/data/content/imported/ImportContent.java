@@ -14,6 +14,14 @@ public class ImportContent {
         values.add(value);
     }
 
+    public void setName(int i, String name) {
+        names.set(i, name);
+    }
+
+    public void setValue(int i, String value) {
+        values.set(i, value);
+    }
+
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
@@ -23,17 +31,17 @@ public class ImportContent {
     }
 
     public String getName(int i) {
-        try{
+        try {
             return names.get(i);
-        } catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             return null;
         }
     }
 
     public String getValue(int i) {
-        try{
+        try {
             return values.get(i);
-        } catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             return null;
         }
     }

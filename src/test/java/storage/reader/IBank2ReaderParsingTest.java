@@ -1,4 +1,4 @@
-package input;
+package storage.reader;
 
 import config.Props;
 import core.service.Service;
@@ -6,6 +6,7 @@ import exceptions.ConversionInterruptedException;
 import org.junit.jupiter.api.*;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import storage.reader.IBank2Reader;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -1,8 +1,9 @@
-package input;
+package storage.reader;
 
 import config.Props;
 import core.data.content.imported.ImportContent;
 import exceptions.ConversionInterruptedException;
+import storage.walker.InputWalker;
 
 import java.io.*;
 import java.nio.charset.Charset;

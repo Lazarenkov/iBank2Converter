@@ -1,10 +1,10 @@
-package output;
+package storage.saver;
 
 import config.Props;
 import core.data.content.processed.DCTProcessedContent;
 import core.data.content.processed.ProcessedContent;
 import exceptions.ConversionInterruptedException;
-import input.InputWalker;
+import storage.walker.InputWalker;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

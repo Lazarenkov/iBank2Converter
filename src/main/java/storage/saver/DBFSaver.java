@@ -1,11 +1,11 @@
-package output;
+package storage.saver;
 
 import com.linuxense.javadbf.DBFWriter;
 import config.Props;
 import core.data.content.processed.DBFProcessedContent;
 import core.data.content.processed.ProcessedContent;
 import exceptions.ConversionInterruptedException;
-import input.InputWalker;
+import storage.walker.InputWalker;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

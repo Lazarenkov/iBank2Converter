@@ -1,4 +1,4 @@
-package input;
+package storage.walker;
 
 import config.Props;
 import exceptions.ConversionInterruptedException;
@@ -14,7 +14,8 @@ import java.util.stream.Stream;
 public class InputWalker {
 
     private static Path currentPath;
-    private static ArrayList<Path> paths = new ArrayList<>();
+    private static final ArrayList<Path> paths = new ArrayList<>();
+    private static Iterator<Path> iterator;
 
     public static void walk() {
         try (Stream<Path> paths = Files.walk(Paths.get(Props.getInputPath()))) {
@@ -23,6 +24,7 @@ public class InputWalker {
         } catch (IOException e) {
             throw new ConversionInterruptedException("Ошибка при чтении директории " + Props.getInputPath());
         }
+        iterator = paths.iterator();
     }
 
     public static ArrayList<Path> getPaths() {
@@ -30,10 +32,8 @@ public class InputWalker {
     }
 
     public static Path getNextPath() {
-        Iterator<Path> iterator = paths.iterator();
         if (iterator.hasNext()) {
             currentPath = iterator.next();
-            iterator.remove();
         } else {
             currentPath = null;
         }
@@ -49,6 +49,6 @@ public class InputWalker {
     }
 
     public static boolean hasNextPath() {
-        return !paths.isEmpty();
+        return iterator.hasNext();
     }
 }

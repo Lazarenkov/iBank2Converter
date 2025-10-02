@@ -116,6 +116,10 @@ public class Props {
         }
     }
 
+    public static String getDateFormat(){
+        return props.get("DATE_FORMAT");
+    }
+
     public static boolean isClearInput() {
         return Boolean.parseBoolean(props.get("CLEAR_INPUT"));
     }

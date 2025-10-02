@@ -1,6 +1,7 @@
 package core.process;
 
 import com.linuxense.javadbf.DBFField;
+import config.Props;
 import core.data.content.imported.ImportContent;
 import core.data.content.processed.DBFProcessedContent;
 import core.data.content.processed.DCTProcessedContent;
@@ -27,6 +28,7 @@ public class DBFProcessor implements Processor {
     public void processData() {
         reduceNamesLength();
         checkDuplicatedDBFNames();
+        formatDates();
         calculateLengths();
         addFields();
         addValues();
@@ -68,6 +70,23 @@ public class DBFProcessor implements Processor {
             index = 1;
         }
         return name.substring(0, 9) + index;
+    }
+
+    private void formatDates() {
+        if (Props.getDateFormat().equals("unchanged")) {
+            return;
+        }
+        for (int i = 0; i < importContent.size(); i++) {
+            String value = importContent.getValue(i);
+            if (value.matches("^(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[0-2])\\.(19|20)\\d{2}$")) {
+                String dd = value.substring(0, 2);
+                String mm = value.substring(3, 5);
+                String yyyy = value.substring(6, 10);
+                String pattern = Props.getDateFormat().toLowerCase();
+                value = pattern.replace("dd", dd).replace("mm", mm).replace("yyyy", yyyy);
+                importContent.setValue(i, value);
+            }
+        }
     }
 
     private void calculateLengths() {

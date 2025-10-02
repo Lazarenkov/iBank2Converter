@@ -1,4 +1,4 @@
-package output;
+package storage.saver;
 
 import core.data.content.processed.CSVProcessedContent;
 import core.data.content.processed.ProcessedContent;
