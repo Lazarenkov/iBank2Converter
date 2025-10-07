@@ -1,4 +1,16 @@
 package core.data.content.processed;
 
-public class CSVProcessedContent extends ProcessedContent { //TODO пока заглушка
+import java.util.ArrayList;
+
+public class CSVProcessedContent extends ProcessedContent {
+
+    private ArrayList<String> values = new ArrayList<>();
+
+    public void add(String value) {
+        values.add(value);
+    }
+
+    public ArrayList<String> getValues() {
+        return values;
+    }
 }

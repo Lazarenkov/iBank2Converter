@@ -22,7 +22,8 @@ public class Props {
         collectOutputFormat(args);
         addDefaultProps();
         readProps();
-        validateProps();
+        validateAllPropsNotNull();
+        validateCharacterset();
     }
 
     private static void collectOutputFormat(String[] args) {
@@ -48,6 +49,7 @@ public class Props {
             case CSV -> {
                 props.put("CSV_OUTPUT", null);
                 props.put("CSV_DCT_OUTPUT", null);
+                props.put("DIVIDER", null);
             }
         }
     }
@@ -76,16 +78,24 @@ public class Props {
         }
     }
 
-    private static void validateProps() {
+    private static void validateAllPropsNotNull() {
         props.forEach((key, value) -> {
             if (value == null || value.isBlank()) {
                 throw new ConversionInterruptedException("Не задан параметр " + key + " в файле properties");
             }
         });
-        String characterset = props.get("СHARACTERSET");
-        if (!characterset.equals("WINDOWS-1251") & !characterset.equals("CP866")) {
-            throw new ConversionInterruptedException("Не корректное значение параметра СHARACTERSET");
+    }
+
+    private static void validateCharacterset() {
+        try{
+            String characterset = props.get("СHARACTERSET");
+            if (!characterset.equals("WINDOWS-1251") & !characterset.equals("CP866")) {
+                throw new ConversionInterruptedException("Не корректное значение параметра СHARACTERSET");
+            }
+        } catch (NullPointerException ignored){
+
         }
+
     }
 
     public static Format getFormat() {
@@ -116,7 +126,7 @@ public class Props {
         }
     }
 
-    public static String getDateFormat(){
+    public static String getDateFormat() {
         return props.get("DATE_FORMAT");
     }
 
@@ -134,5 +144,9 @@ public class Props {
 
     public static boolean isParseEmpty() {
         return Boolean.parseBoolean(props.get("PARSE_EMPTY"));
+    }
+
+    public static String getCsvDivider(){
+        return props.get("DIVIDER");
     }
 }
