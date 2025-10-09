@@ -87,15 +87,13 @@ public class Props {
     }
 
     private static void validateCharacterset() {
-        try{
+        try {
             String characterset = props.get("СHARACTERSET");
             if (!characterset.equals("WINDOWS-1251") & !characterset.equals("CP866")) {
                 throw new ConversionInterruptedException("Не корректное значение параметра СHARACTERSET");
             }
-        } catch (NullPointerException ignored){
-
+        } catch (NullPointerException ignored) {
         }
-
     }
 
     public static Format getFormat() {
@@ -146,7 +144,7 @@ public class Props {
         return Boolean.parseBoolean(props.get("PARSE_EMPTY"));
     }
 
-    public static String getCsvDivider(){
+    public static String getCsvDivider() {
         return props.get("DIVIDER");
     }
 }

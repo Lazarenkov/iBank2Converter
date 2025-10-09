@@ -15,8 +15,6 @@ import storage.saver.SaverFactory;
 public class Main {
 
     public static void main(String[] args){
-        args = new String[]{"csv"};//TODO убрать при генерации JAR
-
         Props.init(args);
 
         InputWalker.walk();
